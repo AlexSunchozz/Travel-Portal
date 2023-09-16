@@ -1,3 +1,3 @@
 import './js/common';
-import './assets/css/style.css';
-import './assets/scss/style.scss';
+import './css/style.css';
+import './scss/style.scss';

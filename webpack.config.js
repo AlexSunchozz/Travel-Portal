@@ -1,59 +1,69 @@
-'use strict';
-
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-let path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
-module.exports = {
-  mode: "development",
-  entry: {app: './src/index.js'},
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js',
+const devServer = (isDev) => !isDev ? {} : {
+  devServer: {
+    open: true,
+    port: 8080,
+    contentBase: path.join(__dirname, 'public'),
   },
+};
 
-  devtool: "source-map",
-  watch: true,
-
+module.exports = ({ development }) => ({
+  mode: development ? 'development' : 'production',
+  devtool: development ? 'inline-source-map' : false,
+  entry: {
+    main: './src/index.js',
+  },
+  output: {
+    filename: '[name].[contenthash].js',
+    path: path.resolve(__dirname, 'dist'),
+    assetModuleFilename: 'assets/[hash][ext]',
+  },
   module: {
     rules: [
-        {
-            test: /\.js$/,
-            loader: 'babel-loader',
-            exclude: '/node_modules'
-        },
-        {
-            test: /\.scss$/,
-            use: [
-              'style-loader',
-              MiniCssExtractPlugin.loader,
-              {
-                loader: 'css-loader',
-                options: { sourceMap: true }
-              }, {
-                loader: 'postcss-loader',
-              }, {
-                loader: 'sass-loader',
-                options: { sourceMap: true }
-              }
-            ]
-        },
-        {
-            test: /\.css$/,
-            use: [
-              'style-loader',
-              MiniCssExtractPlugin.loader,
-              {
-                loader: 'css-loader',
-                options: { sourceMap: true }
-              }, {
-                loader: 'postcss-loader',
-              }
-            ]
-        }
-    ]
+      {
+        test: /\.html$/,
+        use: ["html-loader"],
+      },
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.(?:ico|gif|png|jpg|jpeg|svg|webp)$/i,
+        type: 'asset/resource',
+      },
+      {
+        test: /\.(woff(2)?|eot|ttf|otf)$/i,
+        type: 'asset/resource',
+      },
+      {
+        test: /\.css$/i,
+        use: [MiniCssExtractPlugin.loader, 'css-loader'],
+      },
+      {
+        test: /\.s[ac]ss$/i,
+        use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader']
+      }
+    ],
   },
   plugins: [
-    new MiniCssExtractPlugin({filename: '[name].css'})
+    new MiniCssExtractPlugin({ filename: '[name].[contenthash].css' }),
+    new HtmlWebpackPlugin({ template: './src/index.html' }),
+    // new CopyPlugin({
+    //   patterns: [{
+    //     from: './src/asset'
+    //   }],
+    // }),
+    new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
   ],
-
-};
+  resolve: {
+    extensions: ['.ts', '.js'],
+  },
+  ...devServer(development)
+});
