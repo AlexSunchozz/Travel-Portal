@@ -1,0 +1,1 @@
+{"version":3,"file":"app.css","mappings":"AAAA;IACI,qBAAqB;AACzB,C;ACFA,KAAM,SAAU","sources":["webpack://travel-portal/./src/assets/css/style.css","webpack://travel-portal/./src/assets/scss/style.scss"],"sourcesContent":["body {\r\n    background-color: red;\r\n}","body {color: red;}"],"names":[],"sourceRoot":""}
